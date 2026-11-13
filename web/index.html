@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Manager</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <!-- Main Tablet Container -->
+        <div class="window-container hidden" id="main-window">
+            <!-- Hardware Buttons & Bezel Details -->
+            <div class="tablet-hw-top" aria-hidden="true">
+                <span class="hw-btn hw-power"></span>
+                <span class="hw-btn hw-vol-up"></span>
+                <span class="hw-btn hw-vol-down"></span>
+            </div>
+            <div class="tablet-bezel-left" aria-hidden="true">
+                <span class="bezel-sensor"></span>
+                <span class="bezel-camera"></span>
+                <span class="bezel-mic"></span>
+            </div>
+            <div class="tablet-bezel-right" aria-hidden="true">
+                <span class="bezel-speaker"></span>
+                <span class="bezel-home-pill"></span>
+                <span class="bezel-led"></span>
+            </div>
+
+            <!-- Recessed Tablet Display Glass -->
+            <div class="tablet-screen">
+            <!-- Header Navigation Bar -->
+            <header class="app-header">
+                <div class="header-left">
+                    <div class="logo-badge">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <div class="restaurant-info">
+                        <h1 id="restaurant-name">Burger Shot</h1>
+                        <span id="role-badge" class="badge">Customer View</span>
+                    </div>
+                </div>
+
+                <!-- Tabs (Dynamically displayed based on permissions) -->
+                <nav class="nav-tabs" id="nav-tabs">
+                    <button class="nav-btn active" data-tab="customer-tab" id="tab-btn-customer">
+                        <i class="fa-solid fa-book-open"></i> <span>Menu & Cart</span>
+                    </button>
+                    <button class="nav-btn hidden" data-tab="employee-tab" id="tab-btn-employee">
+                        <i class="fa-solid fa-bell-concierge"></i> <span>Live Orders</span>
+                        <span class="order-counter" id="active-orders-count">0</span>
+                    </button>
+                    <button class="nav-btn hidden" data-tab="recipes-tab" id="tab-btn-recipes">
+                        <i class="fa-solid fa-kitchen-set"></i> <span>Recipes</span>
+                    </button>
+                    <button class="nav-btn hidden" data-tab="manager-tab" id="tab-btn-manager">
+                        <i class="fa-solid fa-chart-line"></i> <span>Management</span>
+                    </button>
+                    <button class="nav-btn hidden" data-tab="owner-tab" id="tab-btn-owner">
+                        <i class="fa-solid fa-crown"></i> <span>Owner Controls</span>
+                    </button>
+                </nav>
+
+                <div class="header-right">
+                    <button class="icon-btn settings-btn" id="btn-ui-settings" title="Tablet Colors & UI Scale Settings">
+                        <i class="fa-solid fa-gear"></i> <span>Settings</span>
+                    </button>
+                    <button class="icon-btn close-btn" id="btn-close" title="Close Window (ESC)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Dynamic Body -->
+            <main class="app-main">
+                <!-- ============================================== -->
+                <!-- TAB 1: CUSTOMER ORDERING VIEW -->
+                <!-- ============================================== -->
+                <section class="tab-pane active" id="customer-tab">
+                    <div class="customer-layout">
+                        <!-- Menu Items Section -->
+                        <div class="menu-section">
+                            <div class="menu-toolbar">
+                                <div class="category-filters" id="category-filters">
+                                    <button class="filter-btn active" data-cat="all">All Items</button>
+                                    <button class="filter-btn" data-cat="food">Burgers & Food</button>
+                                    <button class="filter-btn" data-cat="sides">Sides</button>
+                                    <button class="filter-btn" data-cat="drinks">Drinks</button>
+                                </div>
+                                <div class="search-box">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="menu-search-input" placeholder="Search menu items...">
+                                </div>
+                            </div>
+
+                            <div class="menu-grid" id="menu-grid">
+                                <!-- Dynamic Food Cards injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Shopping Cart Section -->
+                        <div class="cart-section">
+                            <div class="cart-header">
+                                <h3><i class="fa-solid fa-basket-shopping"></i> Your Order</h3>
+                                <button class="clear-cart-btn" id="btn-clear-cart">Clear</button>
+                            </div>
+
+                            <div class="cart-items" id="cart-items">
+                                <div class="cart-empty-message">
+                                    <i class="fa-solid fa-cart-arrow-down"></i>
+                                    <p>Your cart is empty.</p>
+                                    <span>Select items from the menu to build your meal!</span>
+                                </div>
+                            </div>
+
+                            <div class="cart-footer">
+                                <div class="cart-summary">
+                                    <div class="summary-line">
+                                        <span>Subtotal</span>
+                                        <span id="cart-subtotal">$0</span>
+                                    </div>
+                                    <div class="summary-line" id="cart-tax-row">
+                                        <span>Sales Tax (<span id="cart-tax-rate">10</span>%)</span>
+                                        <span id="cart-tax-amount">$0</span>
+                                    </div>
+                                    <div class="summary-line total-line">
+                                        <span>Total Due</span>
+                                        <span id="cart-total">$0</span>
+                                    </div>
+                                </div>
+
+                                <div class="payment-method-selector">
+                                    <label class="pay-option">
+                                        <input type="radio" name="pay-method" value="cash" checked>
+                                        <span class="pay-btn"><i class="fa-solid fa-money-bill-wave"></i> Cash</span>
+                                    </label>
+                                    <label class="pay-option">
+                                        <input type="radio" name="pay-method" value="bank">
+                                        <span class="pay-btn"><i class="fa-solid fa-credit-card"></i> Bank</span>
+                                    </label>
+                                </div>
+
+                                <button class="order-submit-btn" id="btn-submit-order" disabled>
+                                    <span>Place Order</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- TAB 2: EMPLOYEE LIVE ORDERS VIEW -->
+                <!-- ============================================== -->
+                <section class="tab-pane" id="employee-tab">
+                    <div class="orders-view-wrapper">
+                        <div class="orders-top-bar">
+                            <div class="orders-title-info">
+                                <h3><i class="fa-solid fa-bell-concierge"></i> Live Kitchen Orders</h3>
+                                <span>Real-time customer orders. Accept new tickets, prepare meals, and serve.</span>
+                            </div>
+                            <button class="action-btn" id="btn-refresh-orders" title="Sync Live Orders">
+                                <i class="fa-solid fa-rotate"></i> Refresh
+                            </button>
+                        </div>
+
+                        <div class="orders-kanban-board">
+                            <!-- Pending Orders Column -->
+                            <div class="kanban-column" id="col-pending">
+                                <div class="col-header pending-header">
+                                    <span><i class="fa-solid fa-clock"></i> Pending (<span class="col-count">0</span>)</span>
+                                </div>
+                                <div class="col-body" id="orders-list-pending"></div>
+                            </div>
+
+                            <!-- Accepted Orders Column -->
+                            <div class="kanban-column" id="col-accepted">
+                                <div class="col-header accepted-header">
+                                    <span><i class="fa-solid fa-clipboard-check"></i> Accepted (<span class="col-count">0</span>)</span>
+                                </div>
+                                <div class="col-body" id="orders-list-accepted"></div>
+                            </div>
+
+                            <!-- Cooking / In Prep Column -->
+                            <div class="kanban-column" id="col-cooking">
+                                <div class="col-header cooking-header">
+                                    <span><i class="fa-solid fa-fire-burner"></i> Cooking (<span class="col-count">0</span>)</span>
+                                </div>
+                                <div class="col-body" id="orders-list-cooking"></div>
+                            </div>
+
+                            <!-- Ready for Pickup Column -->
+                            <div class="kanban-column" id="col-ready">
+                                <div class="col-header ready-header">
+                                    <span><i class="fa-solid fa-bell"></i> Ready (<span class="col-count">0</span>)</span>
+                                </div>
+                                <div class="col-body" id="orders-list-ready"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- TAB 3: RECIPES DIRECTORY VIEW (Staff Reference) -->
+                <!-- ============================================== -->
+                <section class="tab-pane" id="recipes-tab">
+                    <div class="recipes-view">
+                        <div class="recipes-header">
+                            <h2><i class="fa-solid fa-kitchen-set"></i> Kitchen Recipe Book</h2>
+                            <p>Follow the precise measurements and stations to craft restaurant-grade food.</p>
+                        </div>
+                        <div class="recipes-grid" id="staff-recipes-grid">
+                            <!-- Injected recipe cards -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- TAB 4: MANAGER DASHBOARD -->
+                <!-- ============================================== -->
+                <section class="tab-pane" id="manager-tab">
+                    <div class="manager-layout">
+                        <!-- Sub-Navigation for Manager -->
+                        <div class="sub-nav">
+                            <button class="sub-btn active" data-sub="manager-stock">Stock &amp; Menu</button>
+                            <button class="sub-btn" data-sub="manager-history">Order History &amp; Refunds</button>
+                            <button class="sub-btn" data-sub="manager-staff">Staff Roster</button>
+                            <button class="sub-btn" data-sub="manager-vending"><i class="fa-solid fa-cart-shopping"></i> Vending Manage</button>
+                            <button class="sub-btn" data-sub="manager-vending-fund"><i class="fa-solid fa-sack-dollar"></i> Vending Fund</button>
+                        </div>
+
+                        <!-- Sub-tab 1: Stock & Menu Control -->
+                        <div class="sub-pane active" id="manager-stock">
+                            <div class="panel-header">
+                                <h3>Stock & Price Management</h3>
+                                <span>Toggle item availability or adjust prices in real time.</span>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item Name</th>
+                                            <th>Category</th>
+                                            <th>Current Price</th>
+                                            <th>Stock Count</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stock-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 2: Order History -->
+                        <div class="sub-pane" id="manager-history">
+                            <div class="panel-header">
+                                <h3>Completed & Cancelled Orders</h3>
+                                <button class="action-btn" id="btn-refresh-history"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Customer</th>
+                                            <th>Items</th>
+                                            <th>Total</th>
+                                            <th>Payment</th>
+                                            <th>Status</th>
+                                            <th>Handled By</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="history-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 3: Staff Roster -->
+                        <div class="sub-pane" id="manager-staff">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Staff Roster & Work Hours</h3>
+                                    <span id="staff-roster-summary">All current & past employees who have worked at this job and their cumulative hours.</span>
+                                </div>
+                                <button class="action-btn" id="btn-refresh-staff"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+
+                            <!-- Staff Hiring, Promotion & Tablet Distribution Card -->
+                            <div class="staff-action-card">
+                                <div class="staff-action-header">
+                                    <div class="staff-action-title">
+                                        <i class="fa-solid fa-user-gear"></i>
+                                        <div>
+                                            <h4>Staff Promotion &amp; Tablet Management</h4>
+                                            <span>Hire players, adjust roles, or issue Burgershot tablets by Player Server ID.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="staff-action-form">
+                                    <div class="action-field-group">
+                                        <label for="promote-target-id"><i class="fa-solid fa-hashtag"></i> Server ID</label>
+                                        <input type="number" id="promote-target-id" placeholder="e.g. 1" min="1" step="1">
+                                    </div>
+                                    <div class="action-field-group">
+                                        <label for="promote-grade-select"><i class="fa-solid fa-award"></i> Role / Grade</label>
+                                        <select id="promote-grade-select">
+                                            <option value="0">Loading roles...</option>
+                                        </select>
+                                    </div>
+                                    <div class="action-buttons-group">
+                                        <button class="btn-staff-action btn-promote" id="btn-promote-player" title="Assign Burgershot role to player by Server ID">
+                                            <i class="fa-solid fa-user-check"></i> <span>Hire / Promote</span>
+                                        </button>
+                                        <button class="btn-staff-action btn-give-tab" id="btn-give-tablet-id" title="Give Burgershot tablet item to player by Server ID">
+                                            <i class="fa-solid fa-tablet-screen-button"></i> <span>Give Tablet</span>
+                                        </button>
+                                        <button class="btn-staff-action btn-fire" id="btn-fire-player" title="Remove employee by Server ID">
+                                            <i class="fa-solid fa-user-xmark"></i> <span>Fire Staff</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Citizen ID</th>
+                                            <th>Full Name</th>
+                                            <th>Job Grade</th>
+                                            <th>Hours Worked</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="staff-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 4: Vending Machine Manage -->
+                        <div class="sub-pane" id="manager-vending">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Vending Machine Inventory &amp; Pricing</h3>
+                                    <span>Deposit items from your inventory into the vending machine, set prices, and manage stock.</span>
+                                </div>
+                                <button class="action-btn" id="btn-refresh-vending"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+
+                            <div class="vending-restock-card">
+                                <div class="vending-form-grid">
+                                    <div class="form-group flex-1">
+                                        <label for="vending-item-select">Select Item (From Your Inventory)</label>
+                                        <select id="vending-item-select" class="custom-select"></select>
+                                    </div>
+                                    <div class="form-group vending-num-col">
+                                        <label for="vending-stock-qty">Add Qty</label>
+                                        <input type="number" id="vending-stock-qty" min="1" max="500" value="1">
+                                    </div>
+                                    <div class="form-group vending-num-col">
+                                        <label for="vending-item-price">Unit Price ($)</label>
+                                        <input type="number" id="vending-item-price" min="1" max="50000" value="15">
+                                    </div>
+                                    <div class="form-group vending-submit-col">
+                                        <label>&nbsp;</label>
+                                        <button type="button" class="action-btn primary" id="btn-add-vending-item">
+                                            <i class="fa-solid fa-plus"></i> Restock Vending
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Sale Price ($)</th>
+                                            <th>Stock</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vending-manage-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 5: Vending Machine Fund -->
+                        <div class="sub-pane" id="manager-vending-fund">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Vending Machine Fund</h3>
+                                    <span>All money collected from vending machine purchases is stored here until withdrawn.</span>
+                                </div>
+                                <button class="action-btn" id="btn-refresh-vending-fund"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+
+                            <div class="vending-fund-grid">
+                                <div class="vending-restock-card vending-fund-balance-box">
+                                    <span class="vending-fund-label">Collected Vending Balance</span>
+                                    <div class="vending-fund-amount-display" id="vending-fund-balance">$0</div>
+                                    <span class="vending-fund-subtext">Automatically credited on every customer purchase</span>
+                                </div>
+
+                                <div class="vending-restock-card vending-fund-withdraw-box">
+                                    <div class="vending-form-grid">
+                                        <div class="form-group vending-fund-dest-col">
+                                            <label for="vending-fund-destination">Withdraw To</label>
+                                            <select id="vending-fund-destination" class="custom-select">
+                                                <option value="cash">Cash (In Hand)</option>
+                                                <option value="bank">Personal Bank</option>
+                                                <option value="society">Company Account</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group vending-num-col">
+                                            <label for="vending-fund-amount">Amount ($)</label>
+                                            <input type="number" id="vending-fund-amount" min="1" step="1" placeholder="100">
+                                        </div>
+                                        <div class="form-group vending-submit-col vending-fund-actions">
+                                            <button type="button" class="action-btn primary" id="btn-withdraw-vending-fund">
+                                                <i class="fa-solid fa-money-bill-transfer"></i> Withdraw
+                                            </button>
+                                            <button type="button" class="action-btn" id="btn-withdraw-all-vending-fund">
+                                                <i class="fa-solid fa-vault"></i> Withdraw All
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================== -->
+                <!-- TAB 5: OWNER CONTROLS -->
+                <!-- ============================================== -->
+                <section class="tab-pane" id="owner-tab">
+                    <div class="owner-layout">
+                        <div class="sub-nav">
+                            <button class="sub-btn active" data-sub="owner-stations">Target Zones</button>
+                            <button class="sub-btn" data-sub="owner-doors"><i class="fa-solid fa-door-closed"></i> Door Locks</button>
+                            <button class="sub-btn" data-sub="owner-roles">Roles & Permissions</button>
+                            <button class="sub-btn" data-sub="owner-recipe-editor">Recipe Editor</button>
+                            <button class="sub-btn" data-sub="owner-settings"><i class="fa-solid fa-percent"></i> Tax & Settings</button>
+                            <button class="sub-btn" data-sub="owner-salary"><i class="fa-solid fa-money-bill-trend-up"></i> Salary</button>
+                            <button class="sub-btn" data-sub="owner-logs">Audit Logs</button>
+                            <button class="sub-btn" data-sub="owner-give-tablet"><i class="fa-solid fa-tablet-screen-button"></i> Give Tablet</button>
+                        </div>
+
+                        <!-- Sub-tab 1: Stations Management -->
+                        <div class="sub-pane active" id="owner-stations">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Target Zones & Station Placement</h3>
+                                    <span>Place, manage, or remove third-eye zones for counters, duty clocks, terminals, and cooking appliances.</span>
+                                </div>
+                                <div class="station-placement-actions">
+                                    <select id="station-type-select" class="custom-select">
+                                        <!-- Injected station types -->
+                                    </select>
+                                    <button class="action-btn primary" id="btn-place-station">
+                                        <i class="fa-solid fa-crosshairs"></i> Place Zone (3D Mode)
+                                    </button>
+                                    <button class="action-btn danger" id="btn-delete-all-stations" title="Remove all placed zones">
+                                        <i class="fa-solid fa-trash-can"></i> Clear All Zones
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Zone / Station Type</th>
+                                            <th>Coordinates</th>
+                                            <th>Created By</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stations-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 1b: Door Locks Management -->
+                        <div class="sub-pane" id="owner-doors">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Door Lock Management</h3>
+                                    <span>Add single or double doors in 3D mode. Staff with "Door Unlock" permission can lock/unlock them with [E].</span>
+                                </div>
+                                <div class="station-placement-actions">
+                                    <input type="text" id="door-label-input" placeholder="Door Name (e.g. Main Entrance)" maxlength="60" style="min-width: 220px;">
+                                    <button class="action-btn primary" id="btn-place-door">
+                                        <i class="fa-solid fa-door-open"></i> Pick Door (3D Mode)
+                                    </button>
+                                    <button class="action-btn danger" id="btn-delete-all-doors" title="Remove all saved door locks">
+                                        <i class="fa-solid fa-trash-can"></i> Clear All Doors
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Door Name</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th>Created By</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="doors-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 2: Roles & Permissions -->
+                        <div class="sub-pane" id="owner-roles">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Granular Role Permissions</h3>
+                                    <span>Add new job roles, edit role names &amp; permissions, or delete unused grades.</span>
+                                </div>
+                                <button class="action-btn primary" id="btn-open-role-modal">
+                                    <i class="fa-solid fa-plus"></i> Add New Role
+                                </button>
+                            </div>
+                            <div class="roles-container" id="roles-list-container">
+                                <!-- Injected role cards with checkboxes -->
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 3: Recipe Editor -->
+                        <div class="sub-pane" id="owner-recipe-editor">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Recipe Builder</h3>
+                                    <span>Items must exist in ox_inventory items definition file.</span>
+                                </div>
+                                <button class="action-btn primary" id="btn-open-recipe-modal">
+                                    <i class="fa-solid fa-plus"></i> Create New Recipe
+                                </button>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Station</th>
+                                            <th>Output Item</th>
+                                            <th>Prep Time</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="owner-recipes-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 4: Restaurant & Tax Settings -->
+                        <div class="sub-pane" id="owner-settings">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Tax & Financial Billing Controls</h3>
+                                    <span>Configure the sales tax percentage automatically charged from customers during order checkout.</span>
+                                </div>
+                            </div>
+                            <div class="tax-settings-container">
+                                <div class="tax-settings-card">
+                                    <div class="tax-card-top">
+                                        <div class="tax-card-icon">
+                                            <i class="fa-solid fa-receipt"></i>
+                                        </div>
+                                        <div class="tax-card-title">
+                                            <h4>Customer Order Sales Tax</h4>
+                                            <p>This percentage is calculated on every customer's order subtotal and deducted from their Cash or Bank balance.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="tax-input-section">
+                                        <label for="owner-tax-input">Tax Rate Percentage (%)</label>
+                                        <div class="tax-input-row">
+                                            <div class="tax-input-box">
+                                                <input type="number" id="owner-tax-input" min="0" max="50" step="1" value="10">
+                                                <span class="tax-symbol">%</span>
+                                            </div>
+                                            <button class="action-btn primary" id="btn-save-tax">
+                                                <i class="fa-solid fa-floppy-disk"></i> Save Tax Rate
+                                            </button>
+                                        </div>
+                                        <small class="tax-help-text"><i class="fa-solid fa-circle-info"></i> Enter a rate between 0% (Tax-Free) and 50%.</small>
+                                    </div>
+
+                                    <div class="tax-live-calc-box">
+                                        <div class="calc-box-header">
+                                            <i class="fa-solid fa-calculator"></i> Live Checkout Simulation
+                                        </div>
+                                        <div class="calc-grid">
+                                            <div class="calc-item">
+                                                <span>Sample Order Subtotal</span>
+                                                <strong>$50.00</strong>
+                                            </div>
+                                            <div class="calc-item">
+                                                <span>Tax (<span id="tax-preview-percent">10</span>%)</span>
+                                                <strong id="tax-preview-amount" class="text-warning">$5.00</strong>
+                                            </div>
+                                            <div class="calc-item total">
+                                                <span>Final Total Deducted</span>
+                                                <strong id="tax-preview-total" class="text-success">$55.00</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 5: Staff Order Commission & Periodic Role Salaries -->
+                        <div class="sub-pane" id="owner-salary">
+                            <div class="panel-header">
+                                <div>
+                                    <h3>Staff Salary &amp; Commission Controls</h3>
+                                    <span>Configure per-order completion commission, regular paycheck interval, and base salary per job role.</span>
+                                </div>
+                            </div>
+
+                            <div class="salary-dashboard-grid">
+                                <!-- Left Column: Order Commission + Paycheck Interval -->
+                                <div class="salary-settings-col">
+                                    <div class="tax-settings-card salary-compact-card">
+                                        <div class="tax-card-top">
+                                            <div class="tax-card-icon">
+                                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                                            </div>
+                                            <div class="tax-card-title">
+                                                <h4>Per-Order Finish Payout &amp; Account</h4>
+                                                <p>Percentage paid directly to the employee who finishes an order (also sets paycheck account).</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="tax-input-section">
+                                            <label for="owner-salary-input">Order Commission (%) &amp; Payout Account</label>
+                                            <div class="tax-input-row">
+                                                <div class="tax-input-box">
+                                                    <input type="number" id="owner-salary-input" min="0" max="100" step="1" value="10">
+                                                    <span class="tax-symbol">%</span>
+                                                </div>
+                                                <select id="owner-salary-account" class="custom-select">
+                                                    <option value="bank">Bank Account</option>
+                                                    <option value="cash">Cash</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="tax-live-calc-box">
+                                            <div class="calc-box-header">
+                                                <i class="fa-solid fa-coins"></i> Live Order Commission Preview
+                                            </div>
+                                            <div class="calc-grid">
+                                                <div class="calc-item">
+                                                    <span>Sample Order</span>
+                                                    <strong>$100.00</strong>
+                                                </div>
+                                                <div class="calc-item total">
+                                                    <span>Staff Gets (<span id="salary-preview-percent">10</span>%)</span>
+                                                    <strong id="salary-preview-amount" class="text-success">$10.00</strong>
+                                                </div>
+                                                <div class="calc-item">
+                                                    <span>Net Balance</span>
+                                                    <strong id="salary-preview-net">$90.00</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Scheduled Paycheck Interval Card -->
+                                    <div class="tax-settings-card salary-compact-card">
+                                        <div class="tax-card-top">
+                                            <div class="tax-card-icon">
+                                                <i class="fa-solid fa-clock"></i>
+                                            </div>
+                                            <div class="tax-card-title">
+                                                <h4>Normal Salary Paycheck Timer</h4>
+                                                <p>Automatically deposits each role's base salary every configured interval.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="salary-schedule-row">
+                                            <div class="tax-input-section flex-1">
+                                                <label for="owner-salary-interval">Paycheck Interval (Minutes)</label>
+                                                <div class="tax-input-row">
+                                                    <div class="tax-input-box">
+                                                        <input type="number" id="owner-salary-interval" min="1" max="240" step="1" value="15">
+                                                        <span class="tax-symbol">m</span>
+                                                    </div>
+                                                    <div class="salary-interval-chips" id="salary-interval-presets">
+                                                        <button type="button" class="scale-chip salary-time-chip" data-mins="5">5m</button>
+                                                        <button type="button" class="scale-chip salary-time-chip" data-mins="10">10m</button>
+                                                        <button type="button" class="scale-chip salary-time-chip active" data-mins="15">15m</button>
+                                                        <button type="button" class="scale-chip salary-time-chip" data-mins="30">30m</button>
+                                                        <button type="button" class="scale-chip salary-time-chip" data-mins="60">60m</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="salary-toggles-row">
+                                            <label class="perm-item">
+                                                <input type="checkbox" id="owner-salary-schedule-enabled" checked>
+                                                <span>Enable Automatic Timed Paychecks</span>
+                                            </label>
+                                            <label class="perm-item">
+                                                <input type="checkbox" id="owner-salary-onduty-only" checked>
+                                                <span>Pay On-Duty Staff Only</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="salary-card-actions">
+                                            <button class="action-btn primary" id="btn-save-salary">
+                                                <i class="fa-solid fa-floppy-disk"></i> Save Commission &amp; Schedule
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: Role-by-Role Base Salary List -->
+                                <div class="salary-roles-col">
+                                    <div class="tax-settings-card salary-roles-card">
+                                        <div class="tax-card-top">
+                                            <div class="tax-card-icon">
+                                                <i class="fa-solid fa-users-gear"></i>
+                                            </div>
+                                            <div class="tax-card-title">
+                                                <h4>Base Salary by Role</h4>
+                                                <p>Normal salary amount paid per interval (<span id="salary-roles-interval-badge">Every 15m</span>) for each grade.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="salary-roles-list" id="salary-roles-list">
+                                            <!-- Dynamic role salary rows injected by JS -->
+                                        </div>
+
+                                        <div class="salary-roles-footer">
+                                            <small class="tax-help-text"><i class="fa-solid fa-circle-info"></i> Set $0 for roles without timed pay.</small>
+                                            <div style="display: flex; gap: 8px;">
+                                                <button type="button" class="action-btn" id="btn-pay-salaries-now" title="Pay qualifying staff immediately">
+                                                    <i class="fa-solid fa-paper-plane"></i> Pay Now
+                                                </button>
+                                                <button type="button" class="action-btn primary" id="btn-save-role-salaries">
+                                                    <i class="fa-solid fa-floppy-disk"></i> Save Role Salaries
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 6: Audit Logs -->
+                        <div class="sub-pane" id="owner-logs">
+                            <div class="panel-header">
+                                <h3>Audit Logs & Action History</h3>
+                                <button class="action-btn" id="btn-refresh-logs"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Citizen ID</th>
+                                            <th>Staff Name</th>
+                                            <th>Action</th>
+                                            <th>Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logs-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 8: Give Tablet & Staff Provisioning -->
+                        <div class="sub-pane" id="owner-give-tablet">
+                            <div class="panel-header">
+                                <div>
+                                    <h3><i class="fa-solid fa-tablet-screen-button" style="color: var(--primary-light); margin-right: 8px;"></i> Tablet Distribution &amp; Staff Issue</h3>
+                                    <span>Issue official Burgershot tablets to employees or any citizen by Player ID, and assign job ranks.</span>
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <button class="action-btn" id="btn-owner-give-self" title="Instantly give an official Burgershot tablet to yourself">
+                                        <i class="fa-solid fa-hand-holding-hand"></i> Give To Myself
+                                    </button>
+                                    <button class="action-btn" id="btn-refresh-online-players">
+                                        <i class="fa-solid fa-rotate"></i> Refresh Players
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Direct Server ID Dispatch Card -->
+                            <div class="staff-action-card">
+                                <div class="staff-action-header">
+                                    <div class="staff-action-title">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                        <div>
+                                            <h4>Direct Server ID Dispatch</h4>
+                                            <span>Enter any player's active Server ID on the server to send them an official Burgershot tablet or assign a job rank.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="staff-action-form">
+                                    <div class="action-field-group">
+                                        <label for="owner-target-id"><i class="fa-solid fa-hashtag"></i> Server ID</label>
+                                        <input type="number" id="owner-target-id" placeholder="e.g. 1" min="1" step="1">
+                                    </div>
+                                    <div class="action-field-group">
+                                        <label for="owner-grade-select"><i class="fa-solid fa-award"></i> Assign Job Role / Grade</label>
+                                        <select id="owner-grade-select">
+                                            <option value="0">Loading roles...</option>
+                                        </select>
+                                    </div>
+                                    <div class="action-buttons-group">
+                                        <button class="btn-staff-action btn-give-tab" id="owner-btn-give-tab" title="Give Burgershot tablet item to this Server ID">
+                                            <i class="fa-solid fa-tablet-screen-button"></i> <span>Give Tablet</span>
+                                        </button>
+                                        <button class="btn-staff-action btn-promote" id="owner-btn-promote" title="Set Burgershot role for this Server ID">
+                                            <i class="fa-solid fa-user-check"></i> <span>Assign Role</span>
+                                        </button>
+                                        <button class="btn-staff-action btn-fire" id="owner-btn-fire" title="Dismiss player from Burgershot">
+                                            <i class="fa-solid fa-user-xmark"></i> <span>Fire Staff</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Online Players Table & Quick Give -->
+                            <div class="table-container">
+                                <div class="tablet-search-toolbar">
+                                    <div class="search-box">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                        <input type="text" id="owner-players-search" placeholder="Filter online players by name, citizen ID or server ID...">
+                                    </div>
+                                    <span class="online-players-counter" id="online-players-count">Loading players...</span>
+                                </div>
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Server ID</th>
+                                            <th>Full Name</th>
+                                            <th>Citizen ID</th>
+                                            <th>Current Job</th>
+                                            <th>Staff Status</th>
+                                            <th>Quick Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="owner-players-table-body">
+                                        <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">Loading online players...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODAL: RECIPE BUILDER / EDITOR -->
+        <!-- ============================================== -->
+        <div class="modal-overlay hidden" id="recipe-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="recipe-modal-title">Create New Recipe</h3>
+                    <button class="icon-btn modal-close" id="btn-close-recipe-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-recipe-id" value="">
+                    
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label>Recipe Display Name</label>
+                            <input type="text" id="recipe-input-name" placeholder="e.g. Classic Burger">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label>Station Type</label>
+                            <select id="recipe-input-station" class="custom-select"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label>Output Item (ox_inventory)</label>
+                            <input type="text" id="recipe-output-search" placeholder="Search item (e.g. coffee, burger, bs_)..." style="margin-bottom: 6px;">
+                            <select id="recipe-input-output" class="custom-select"></select>
+                        </div>
+                        <div class="form-group flex-half">
+                            <label>Output Count</label>
+                            <input type="number" id="recipe-input-count" value="1" min="1" max="10">
+                        </div>
+                        <div class="form-group flex-half">
+                            <label>Prep Time (seconds)</label>
+                            <input type="number" id="recipe-input-time" value="5" min="1" max="60">
+                        </div>
+                    </div>
+
+                    <div class="ingredients-header">
+                        <h4>Required Ingredients</h4>
+                        <button type="button" class="action-btn small" id="btn-add-ingredient">
+                            <i class="fa-solid fa-plus"></i> Add Ingredient
+                        </button>
+                    </div>
+
+                    <div class="ingredients-list" id="recipe-ingredients-list">
+                        <!-- Dynamic ingredient input rows -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="action-btn" id="btn-cancel-recipe">Cancel</button>
+                    <button class="action-btn primary" id="btn-save-recipe">Save Recipe</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODAL: ADD / EDIT ROLE & PERMISSIONS -->
+        <!-- ============================================== -->
+        <div class="modal-overlay hidden" id="role-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="role-modal-title">Add New Role</h3>
+                    <button class="icon-btn modal-close" id="btn-close-role-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="role-input-is-new" value="1">
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="role-input-name">Role Name</label>
+                            <input type="text" id="role-input-name" placeholder="e.g. Delivery Driver" maxlength="50">
+                        </div>
+                        <div class="form-group flex-half">
+                            <label for="role-input-grade">Grade Level (0-99)</label>
+                            <input type="number" id="role-input-grade" min="0" max="99" value="1">
+                        </div>
+                        <div class="form-group flex-half">
+                            <label for="role-input-salary">Base Salary ($)</label>
+                            <input type="number" id="role-input-salary" min="0" max="1000000" value="0">
+                        </div>
+                    </div>
+                    <div class="ingredients-header">
+                        <h4>Role Permissions</h4>
+                    </div>
+                    <div class="perms-checklist role-modal-perms" id="role-modal-perms-list">
+                        <!-- Dynamic permission checkboxes -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="action-btn" id="btn-cancel-role">Cancel</button>
+                    <button class="action-btn primary" id="btn-save-role-modal">Save Role</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODAL: UNIVERSAL TABLET SETTINGS (SCALE & THEME) -->
+        <!-- ============================================== -->
+        <div class="modal-overlay hidden" id="ui-settings-modal">
+            <div class="modal-card settings-modal-card">
+                <div class="modal-header">
+                    <div class="settings-modal-title">
+                        <div class="settings-title-icon"><i class="fa-solid fa-sliders"></i></div>
+                        <div>
+                            <h3>Tablet Display &amp; Theme Settings</h3>
+                            <p>Customize tablet colors and UI scale (saved for your screen)</p>
+                        </div>
+                    </div>
+                    <button class="icon-btn modal-close" id="btn-close-settings-modal" title="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body settings-modal-body">
+                    <!-- UI Scale Section -->
+                    <div class="ui-pref-card">
+                        <div class="ui-pref-head">
+                            <div>
+                                <h4><i class="fa-solid fa-up-right-and-down-left-from-center"></i> UI Scale</h4>
+                                <p>Resize the tablet to fit your screen preference</p>
+                            </div>
+                            <span class="scale-value-pill" id="settings-scale-value">100%</span>
+                        </div>
+                        <div class="scale-slider-row">
+                            <span class="scale-bound">65%</span>
+                            <input type="range" id="setting-ui-scale" class="ui-scale-slider" min="0.65" max="1.25" step="0.01" value="1">
+                            <span class="scale-bound">125%</span>
+                        </div>
+                        <div class="scale-presets" id="scale-presets">
+                            <button type="button" class="scale-chip" data-scale="0.75">75%</button>
+                            <button type="button" class="scale-chip" data-scale="0.85">85%</button>
+                            <button type="button" class="scale-chip" data-scale="0.95">95%</button>
+                            <button type="button" class="scale-chip active" data-scale="1">100%</button>
+                            <button type="button" class="scale-chip" data-scale="1.1">110%</button>
+                            <button type="button" class="scale-chip" data-scale="1.2">120%</button>
+                        </div>
+                    </div>
+
+                    <!-- Accent Color Section -->
+                    <div class="ui-pref-card">
+                        <div class="ui-pref-head">
+                            <div>
+                                <h4><i class="fa-solid fa-palette"></i> Accent Color</h4>
+                                <p>Buttons, active tabs, highlights &amp; badge trim</p>
+                            </div>
+                            <label class="custom-color-control" title="Pick custom accent color">
+                                <input type="color" id="setting-accent-color" value="#e08e0b">
+                                <span id="setting-accent-hex">#E08E0B</span>
+                            </label>
+                        </div>
+                        <div class="color-swatch-row" id="accent-swatches">
+                            <button type="button" class="color-swatch active" data-target="accent" data-color="#e08e0b" title="Burger Gold" style="background: #e08e0b;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#ef4444" title="Crimson Red" style="background: #ef4444;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#10b981" title="Emerald Green" style="background: #10b981;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#0ea5e9" title="Sky Blue" style="background: #0ea5e9;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#8b5cf6" title="Royal Violet" style="background: #8b5cf6;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#f43f5e" title="Coral Rose" style="background: #f43f5e;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#14b8a6" title="Ocean Teal" style="background: #14b8a6;"></button>
+                            <button type="button" class="color-swatch" data-target="accent" data-color="#cbd5e1" title="Clean Silver" style="background: #cbd5e1;"></button>
+                        </div>
+                    </div>
+
+                    <!-- Frame & Screen Color Grid -->
+                    <div class="ui-pref-grid-2">
+                        <div class="ui-pref-card">
+                            <div class="ui-pref-head">
+                                <div>
+                                    <h4><i class="fa-solid fa-tablet-screen-button"></i> Tablet Frame</h4>
+                                    <p>Outer 3D embossed bezel</p>
+                                </div>
+                                <label class="custom-color-control" title="Pick custom frame color">
+                                    <input type="color" id="setting-chassis-color" value="#232833">
+                                    <span id="setting-chassis-hex">#232833</span>
+                                </label>
+                            </div>
+                            <div class="color-swatch-row" id="chassis-swatches">
+                                <button type="button" class="color-swatch active" data-target="chassis" data-color="#232833" title="Space Titanium" style="background: #232833;"></button>
+                                <button type="button" class="color-swatch" data-target="chassis" data-color="#14161c" title="Stealth Obsidian" style="background: #14161c;"></button>
+                                <button type="button" class="color-swatch" data-target="chassis" data-color="#5c6678" title="Brushed Silver" style="background: #5c6678;"></button>
+                                <button type="button" class="color-swatch" data-target="chassis" data-color="#4d392d" title="Warm Bronze" style="background: #4d392d;"></button>
+                                <button type="button" class="color-swatch" data-target="chassis" data-color="#1e2d40" title="Navy Steel" style="background: #1e2d40;"></button>
+                                <button type="button" class="color-swatch" data-target="chassis" data-color="#293529" title="Tactical Olive" style="background: #293529;"></button>
+                            </div>
+                        </div>
+
+                        <div class="ui-pref-card">
+                            <div class="ui-pref-head">
+                                <div>
+                                    <h4><i class="fa-solid fa-fill-drip"></i> Screen Surface</h4>
+                                    <p>Display interior &amp; panels</p>
+                                </div>
+                                <label class="custom-color-control" title="Pick custom screen color">
+                                    <input type="color" id="setting-screen-color" value="#141923">
+                                    <span id="setting-screen-hex">#141923</span>
+                                </label>
+                            </div>
+                            <div class="color-swatch-row" id="screen-swatches">
+                                <button type="button" class="color-swatch active" data-target="screen" data-color="#141923" title="Midnight Slate" style="background: #141923;"></button>
+                                <button type="button" class="color-swatch" data-target="screen" data-color="#0d1016" title="Pure Obsidian" style="background: #0d1016;"></button>
+                                <button type="button" class="color-swatch" data-target="screen" data-color="#101b2e" title="Deep Navy" style="background: #101b2e;"></button>
+                                <button type="button" class="color-swatch" data-target="screen" data-color="#1d1614" title="Dark Espresso" style="background: #1d1614;"></button>
+                                <button type="button" class="color-swatch" data-target="screen" data-color="#13221d" title="Forest Dark" style="background: #13221d;"></button>
+                                <button type="button" class="color-swatch" data-target="screen" data-color="#e5e9f0" title="Arctic Light" style="background: #e5e9f0;"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer settings-modal-footer">
+                    <button type="button" class="action-btn" id="btn-reset-ui-settings">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Default
+                    </button>
+                    <button type="button" class="action-btn primary" id="btn-done-ui-settings">
+                        <i class="fa-solid fa-check"></i> Save &amp; Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- STATION COOKING & BATCH PROCESSING VIEW -->
+        <!-- ============================================== -->
+        <div class="station-cooking-container hidden" id="station-cooking-view">
+            <!-- Hardware Buttons & Bezel Details -->
+            <div class="tablet-hw-top" aria-hidden="true">
+                <span class="hw-btn hw-power"></span>
+                <span class="hw-btn hw-vol-up"></span>
+                <span class="hw-btn hw-vol-down"></span>
+            </div>
+            <div class="tablet-bezel-left" aria-hidden="true">
+                <span class="bezel-sensor"></span>
+                <span class="bezel-camera"></span>
+                <span class="bezel-mic"></span>
+            </div>
+            <div class="tablet-bezel-right" aria-hidden="true">
+                <span class="bezel-speaker"></span>
+                <span class="bezel-home-pill"></span>
+                <span class="bezel-led"></span>
+            </div>
+
+            <!-- Recessed Tablet Display Glass -->
+            <div class="tablet-screen">
+            <!-- Header -->
+            <header class="station-header">
+                <div class="station-header-left">
+                    <div class="station-icon-badge" id="station-icon-badge">
+                        <i class="fa-solid fa-fire-burner"></i>
+                    </div>
+                    <div class="station-title-info">
+                        <div class="station-title-row">
+                            <h2 id="station-ui-title">Assembly Board</h2>
+                            <span class="station-badge" id="station-ui-type">Cooking Station</span>
+                        </div>
+                        <p class="station-subtitle">Select a recipe, choose your batch quantity, and prepare food.</p>
+                    </div>
+                </div>
+                <div class="station-header-right">
+                    <button class="icon-btn settings-btn" id="btn-station-settings" title="Tablet Colors & UI Scale Settings">
+                        <i class="fa-solid fa-gear"></i> <span>Settings</span>
+                    </button>
+                    <button class="icon-btn close-btn" id="btn-close-station-view" title="Close (ESC)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Layout (2 Columns: Recipes list vs Batch Processing Panel) -->
+            <div class="station-body">
+                <!-- Left Sidebar: Station Recipes -->
+                <aside class="station-sidebar">
+                    <div class="sidebar-top">
+                        <div class="sidebar-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="station-recipe-search" placeholder="Search recipes...">
+                        </div>
+                        <div class="sidebar-meta">
+                            <span>Available Recipes</span>
+                            <span class="badge" id="station-recipe-count">0</span>
+                        </div>
+                    </div>
+                    <div class="station-recipes-list" id="station-recipes-list">
+                        <!-- Dynamic Recipe Cards -->
+                    </div>
+                </aside>
+
+                <!-- Right Pane: Recipe Detail & Batch Cooking Controls -->
+                <section class="station-detail-pane">
+                    <!-- Empty selection placeholder -->
+                    <div class="station-empty-state" id="station-empty-state">
+                        <div class="empty-icon-wrap">
+                            <i class="fa-solid fa-kitchen-set"></i>
+                        </div>
+                        <h3>Select a Recipe</h3>
+                        <p>Pick any dish from the left list to review ingredients and choose how many you want to cook.</p>
+                    </div>
+
+                    <!-- Active Recipe Processing Panel -->
+                    <div class="station-recipe-panel hidden" id="station-recipe-panel">
+                        <!-- Recipe Headline Card -->
+                        <div class="dish-hero-card">
+                            <div class="dish-hero-icon" id="dish-hero-icon">
+                                <i class="fa-solid fa-burger"></i>
+                            </div>
+                            <div class="dish-hero-info">
+                                <h3 id="dish-hero-title">Classic Burger</h3>
+                                <div class="dish-hero-tags">
+                                    <span class="dish-tag"><i class="fa-regular fa-clock"></i> <span id="dish-base-time">5s</span> per unit</span>
+                                    <span class="dish-tag"><i class="fa-solid fa-gift"></i> Yield: <span id="dish-base-yield">1x Classic Burger</span></span>
+                                    <span class="dish-tag success-tag" id="dish-craftable-tag"><i class="fa-solid fa-check"></i> Ready to Cook</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Batch Processing Quantity Selector -->
+                        <div class="batch-selector-box">
+                            <div class="batch-selector-header">
+                                <div class="batch-label-group">
+                                    <label><i class="fa-solid fa-layer-group"></i> How many do you want to cook?</label>
+                                    <span class="batch-hint">Choose a batch amount to process multiple items at once.</span>
+                                </div>
+                                <div class="batch-stepper">
+                                    <button type="button" class="stepper-btn" id="btn-batch-dec" title="Decrease">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+                                    <input type="number" id="batch-amount-input" class="batch-input" value="1" min="1" max="20">
+                                    <button type="button" class="stepper-btn" id="btn-batch-inc" title="Increase">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Preset Buttons -->
+                            <div class="batch-presets">
+                                <button type="button" class="preset-pill active" data-amount="1">1x</button>
+                                <button type="button" class="preset-pill" data-amount="2">2x</button>
+                                <button type="button" class="preset-pill" data-amount="3">3x</button>
+                                <button type="button" class="preset-pill" data-amount="5">5x</button>
+                                <button type="button" class="preset-pill" data-amount="10">10x</button>
+                                <button type="button" class="preset-pill max-pill" id="btn-batch-max" title="Cook maximum possible with current inventory">
+                                    <i class="fa-solid fa-bolt"></i> Max (<span id="batch-max-val">0</span>)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Required Ingredients Checklist -->
+                        <div class="station-ingredients-box">
+                            <div class="ingredients-box-header">
+                                <h4><i class="fa-solid fa-basket-shopping"></i> Required Ingredients for Batch</h4>
+                                <span class="inventory-check-status" id="ingredients-overall-status">All In Stock</span>
+                            </div>
+                            <div class="ingredients-items-grid" id="station-ingredients-grid">
+                                <!-- Dynamic ingredient cards with live counts -->
+                            </div>
+                        </div>
+
+                        <!-- Cooking Output & Action Card -->
+                        <div class="station-cooking-action-bar">
+                            <div class="action-summary-info">
+                                <div class="summary-metric">
+                                    <span class="metric-lbl">Total Output</span>
+                                    <span class="metric-val" id="summary-total-output">1x Classic Burger</span>
+                                </div>
+                                <div class="summary-metric">
+                                    <span class="metric-lbl">Estimated Duration</span>
+                                    <span class="metric-val" id="summary-total-time">5 seconds</span>
+                                </div>
+                            </div>
+                            <div class="action-btn-wrapper">
+                                <button type="button" class="action-btn primary cook-now-btn" id="btn-station-cook-now">
+                                    <i class="fa-solid fa-fire"></i>
+                                    <span id="btn-cook-label">Start Cooking (1x)</span>
+                                </button>
+                                <div class="cook-error-notice hidden" id="cook-error-notice">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <span id="cook-error-text">Insufficient ingredients in your inventory.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Station Footer -->
+            <footer class="station-footer">
+                <div class="footer-spacer"></div>
+                <button type="button" class="action-btn secondary" id="btn-station-cancel">
+                    Close Station
+                </button>
+            </footer>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VENDING MACHINE CUSTOMER KIOSK VIEW -->
+        <!-- ============================================== -->
+        <div class="modal-overlay hidden" id="vending-customer-view">
+            <div class="modal-card vending-kiosk-card">
+                <div class="modal-header">
+                    <div class="settings-modal-title">
+                        <div class="settings-title-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                        <div>
+                            <h3 id="vending-shop-title">Burger Shot Vending Machine</h3>
+                            <p>Add items to your cart and checkout using Cash or Bank</p>
+                        </div>
+                    </div>
+                    <div class="vending-header-actions">
+                        <button type="button" class="icon-btn modal-close" id="btn-close-vending-view" title="Close (ESC)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body vending-kiosk-body">
+                    <div class="vending-layout">
+                        <div class="vending-catalog-section">
+                            <div class="vending-grid" id="vending-customer-grid">
+                                <!-- Dynamic vending items -->
+                            </div>
+                        </div>
+                        <div class="cart-section vending-cart-section">
+                            <div class="cart-header">
+                                <h3><i class="fa-solid fa-basket-shopping"></i> Vending Cart</h3>
+                                <button type="button" class="clear-cart-btn" id="btn-vending-clear-cart">Clear</button>
+                            </div>
+
+                            <div class="cart-items" id="vending-cart-items">
+                                <div class="cart-empty-message">
+                                    <i class="fa-solid fa-cart-arrow-down"></i>
+                                    <p>Your cart is empty.</p>
+                                    <span>Add items from the machine to buy together!</span>
+                                </div>
+                            </div>
+
+                            <div class="cart-footer">
+                                <div class="cart-summary">
+                                    <div class="summary-line">
+                                        <span>Items in Cart</span>
+                                        <span id="vending-cart-count">0</span>
+                                    </div>
+                                    <div class="summary-line total-line">
+                                        <span>Total Due</span>
+                                        <span id="vending-cart-total">$0</span>
+                                    </div>
+                                </div>
+
+                                <div class="payment-method-selector" id="vending-pay-switch">
+                                    <label class="pay-option">
+                                        <input type="radio" name="vending-pay-method" id="vending-pay-cash" value="cash" checked>
+                                        <span class="pay-btn"><i class="fa-solid fa-money-bill-wave"></i> Cash</span>
+                                    </label>
+                                    <label class="pay-option">
+                                        <input type="radio" name="vending-pay-method" id="vending-pay-bank" value="bank">
+                                        <span class="pay-btn"><i class="fa-solid fa-building-columns"></i> Bank</span>
+                                    </label>
+                                </div>
+
+                                <button type="button" class="order-submit-btn" id="btn-vending-checkout" disabled>
+                                    <i class="fa-solid fa-bag-shopping"></i>
+                                    <span id="vending-checkout-label">Checkout ($0)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast Container -->
+        <div class="toast-container" id="toast-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
